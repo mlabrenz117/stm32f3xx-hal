@@ -28,6 +28,9 @@ pub struct PullDown;
 /// Pulled up input (type state)
 pub struct PullUp;
 
+/// Analog input (type state)
+pub struct Analog;
+
 /// Output mode (type state)
 pub struct Output<MODE> {
     _mode: PhantomData<MODE>,
@@ -198,7 +201,7 @@ macro_rules! gpio {
                 use super::{
                     AF4, AF5, AF6, AF7, AF14, Floating, GpioExt, Input, OpenDrain, Output,
                     PullDown, PullUp, PushPull,
-                    PXx, Gpio,
+                    PXx, Gpio, Analog,
                 };
 
                 /// GPIO parts
@@ -487,6 +490,27 @@ macro_rules! gpio {
                             pupdr
                                 .pupdr()
                                 .modify(|r, w| unsafe { w.bits(r.bits() & !(0b11 << offset)) });
+
+                            $PXi { _mode: PhantomData }
+                        }
+
+                        /// Configures the pin to operate as an analog input pin
+                        pub fn into_analog_input(
+                            self,
+                            moder: &mut MODER,
+                            pupdr: &mut PUPDR,
+                        ) -> $PXi<Input<Analog>> {
+                            let offset = 2 * $i;
+
+                            // analog mode
+                            moder
+                                .moder()
+                                .modify(|r, w| unsafe { w.bits(r.bits() & !(0b00 << offset)) });
+
+                            // no pull-up or pull-down
+                            pupdr
+                                .pupdr()
+                                .modify(|r, w| unsafe { w.bits(r.bits() & !(0b11 << ofset)) });
 
                             $PXi { _mode: PhantomData }
                         }
