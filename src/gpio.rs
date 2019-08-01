@@ -510,7 +510,7 @@ macro_rules! gpio {
                             // no pull-up or pull-down
                             pupdr
                                 .pupdr()
-                                .modify(|r, w| unsafe { w.bits(r.bits() & !(0b11 << ofset)) });
+                                .modify(|r, w| unsafe { w.bits(r.bits() & !(0b11 << offset)) });
 
                             $PXi { _mode: PhantomData }
                         }
